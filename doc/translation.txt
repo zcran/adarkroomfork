@@ -1,0 +1,137 @@
+
+如何翻译
+=====================================================================
+
+** 给开发者的说明 **：
+
+所有发送到页面的字符串都必须通过 javascript 函数 _() 进行处理，该函数会负责翻译。因此，如果你添加了新字符串，请用 _('') 函数包裹它们。
+
+如果你想在 CSS 中添加一些字符串（使用 content 属性），请同时编辑 /script/localization.js 文件。
+
+谢谢 :)
+
+
+添加新语言
+=====================================================================
+
+所需工具：
+
+	ubuntu:
+   	     apt-get install gettext
+   	     apt-get install poedit
+   	     apt-get install python
+
+	windows:
+   	     http://poedit.net/
+   	     https://www.python.org/download/windows/
+
+	mac:
+	    http://poedit.net
+	    https://www.python.org/downloads/mac-osx/
+
+步骤：
+1) 创建一个新目录 lang/{新语言代码}
+2) 下载 lang 文件夹中的 adarkroom.pot 文件作为翻译模板
+3) 创建新的 po 文件：
+
+  ubuntu:
+	msginit --locale {新语言的 locale，例如 en_US} -i lang/adarkroom.pot -o lang/{新语言}/strings.po
+  windows:
+        - 打开应用程序界面 > 文件 > 新建... > [选择要翻译的语言] > 另存为... > lang/{新语言代码}/strings.po
+        - [从 POT 文件更新] > 选择 lang/adarkroom.pot
+
+4) 复制 lang/main.css 到 lang/{新语言}
+5) 用 poedit 软件打开 lang/{新语言}/strings.po
+6) 翻译...
+7) 继续翻译...
+8) 完成了？确定？
+9) 使用 python 脚本 (/tools/po2js.py) 将 po 文件转换为 js 文件
+
+  	从命令行/终端运行：
+	     python tools/po2js.py lang/{新语言}/strings.po
+  	注意：
+	     确保已安装 polib 模块，否则命令行/终端会报错
+	     polib 可以通过命令行/终端从 python 网站下载并安装
+       在 Windows 上，可能需要以管理员身份运行命令提示符
+       Win Vista/7：开始 > 右键单击命令提示符 > 以管理员身份运行
+       Win 8：文件面板 > 鼠标悬停在命令提示符上 > 单击“以管理员身份运行命令提示符”
+
+10) 编辑 README.md 并添加以下字符串：[{新语言名称}](http://adarkroom.doublespeakgames.com/?lang={新语言代码})
+11) 编辑 lang/langs.js 并添加新语言
+
+注意：如果你的句子太长，需要更新一些 CSS，请在 /lang/{新语言}/main.css 中覆盖它
+
+
+更新模板文件
+=====================================================================
+
+当代码中的新内容或更改引入了新字符串时，必须更新文件 lang/adarkroom.pot。
+
+所需工具：
+
+	ubuntu:
+ 	     apt-get install python3-babel
+
+	windows & mac:
+  	     poedit
+
+步骤：
+  ubuntu:
+	pybabel extract -F babel.cfg -c "TRANSLATORS" script > lang/adarkroom.pot
+
+  windows:
+	使用 poedit
+	使用菜单 "目录" -> "从 POT 文件新建目录..."
+
+
+更新语言文件
+=====================================================================
+
+所需工具：
+
+	ubuntu:
+ 	     * gettext
+	windows & mac:
+  	     * poedit
+
+
+- ubuntu:
+	msgmerge -U lang/{语言}/strings.po lang/adarkroom.pot
+
+  windows:
+	在 poedit 中打开 lang/{语言}strings.po
+	使用菜单 "目录" -> "从 POT 文件更新..."
+
+	或者
+
+	在 "设置 POEDIT" 之后
+	使用菜单 "目录" -> "从源代码更新"
+
+- 在 poedit 中像“添加新语言”一样进行编辑
+
+
+设置 POEDIT
+=====================================================================
+
+如需无需 pot 文件从源代码更新，需要：
+
+- 创建新解析器：
+  文件 > 首选项 > 解析器 > 新建
+
+  语言：
+  JS
+
+  扩展名列表：
+  *.js
+
+  解析器命令：
+  xgettext --language=JavaScript --force-po --add-comments=TRANSLATORS -o %o %C %K %F
+
+  关键字列表中的项目：
+  -k%k
+
+  输入文件列表中的项目：
+  %f
+
+  源代码字符集：
+  --from-code=%c
