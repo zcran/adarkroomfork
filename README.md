@@ -1,7 +1,7 @@
 运行命令
 webserve
 
-
+git add --all; git commit -m "normal update"; git push -u origin main
 
 A Dark Room
 ===========
